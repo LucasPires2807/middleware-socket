@@ -7,55 +7,62 @@ import java.net.Socket;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class Stub {
-    private static Socket socketServicoNome;
+    private ServicoNome servicoNome;
+    private Socket socketServicoNome;
+    private Socket socketApp;
     private List<String> servicoSolicitado;
     private PrintWriter stubParaNomes;
     private BufferedReader nomesParaStub;
+    private PrintWriter stubParaApp;
+    private  BufferedReader appParaStub;
     private List<Object> enderecoServico;
+    private Object output;
 
-    public void receberSolicitacaoServico(List<String> servicoSolicitado) {
+    public Object receberSolicitacaoServico(List<String> servicoSolicitado) {
         this.servicoSolicitado = servicoSolicitado;
         // Conectar o Stub com o serviço de nomes
         try{
-            conectarSockets(80);
+            servicoNome.receberSolicitacaoServico();
+            conectarNomesSockets(80);
             // Manda para o serviço de nomes o serviço solicitado
             stubParaNomes = new PrintWriter(socketServicoNome.getOutputStream(), true);
             stubParaNomes.println(servicoSolicitado.get(0));
             nomesParaStub = new BufferedReader(new InputStreamReader(socketServicoNome.getInputStream()));
             // Pega o endereço do serviço
             enderecoServico = Collections.singletonList(nomesParaStub.readLine());
+            conectarAppSockets(90);
+            stubParaApp = new PrintWriter(socketApp.getOutputStream(), true);
+            // Tem que fazer a lógica de enviar os parâmetros também
+            stubParaApp.println(enderecoServico);
+            nomesParaStub = new BufferedReader(new InputStreamReader(socketApp.getInputStream()));
+            output = nomesParaStub.readLine();
+            closeConnection();
+            return output;
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        return null;
     }
 
-    private void conectarSockets(int port) throws IOException {
+    private void conectarNomesSockets(int port) throws IOException {
         socketServicoNome =  new Socket("localhost", port);
     }
 
-//    private static void initializeStreamVariables() throws IOException {
-//        keyboardInput = new BufferedReader(new InputStreamReader(System.in));
-//        clientAnswer = new PrintWriter(socket.getOutputStream(), true);
-//        serverAnswer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//    }
+    private void conectarAppSockets(int port) throws IOException {
+        socketApp =  new Socket("localhost", port);
+    }
 
-
-//    public static String sendMessage() throws IOException {
-//        String str = keyboardInput.readLine();
-//        return str;
-//    }
-//
-//    public static void readMessage() throws IOException {
-//        System.out.println(serverAnswer.readLine());
-//    }
-//
-//    public static void closeConnection() throws IOException {
-//        clientAnswer.close();
-//        keyboardInput.close();
-//        socket.close();
-//    }
+    public void closeConnection() throws IOException {
+        socketServicoNome.close();
+        socketApp.close();
+        socketServicoNome.close();
+        nomesParaStub.close();
+        appParaStub.close();
+        stubParaApp.close();
+        stubParaNomes.close();
+    }
 
 }
