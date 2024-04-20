@@ -13,6 +13,10 @@ import java.util.Map;
 
 public class ServicoNome {
     Map<String, List<Object>> listaServicos = new HashMap<>();
+    private static ServerSocket serverStubSocket;
+    private static Socket socket;
+    private BufferedReader stubParaNomes;
+    private PrintWriter nomesParaStub;
     public ServicoNome() {
         List<Object> valores1 = new ArrayList<>();
         valores1.add("localhost");
@@ -22,7 +26,7 @@ public class ServicoNome {
         valores2.add(8002);
         List<Object> valores3 = new ArrayList<>();
         valores2.add("localhost");
-        valores2.add(8002);
+        valores2.add(8003);
         listaServicos.put("Login", valores1);
         listaServicos.put("Somar", valores2);
         listaServicos.put("Subtrair", valores3);
@@ -32,33 +36,30 @@ public class ServicoNome {
         return listaServicos;
     }
 
-    public String receberSolicitacaoServico(List<String> _valores){
+    public void receberSolicitacaoServico(){
+        try{
+            conectarSockets(80);
+            // Recebendo o nome que o usuário passou para o stub
+            stubParaNomes = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String nome = stubParaNomes.readLine();
+            // Enviando o ip e a porta
+            nomesParaStub = new PrintWriter(socket.getOutputStream(), true);
+            nomesParaStub.println(listaServicos.get(nome));
 
-    }
-    private static ServerSocket serverSocket;
-    private static Socket socket;
-    private static PrintWriter output;
-    private static BufferedReader input;
-    
-    private static void initializeStreamVariables() throws IOException {
-        output = new PrintWriter(socket.getOutputStream(), true);
-        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    }
-    public static String recieveMessage() throws IOException {
-        String request = input.readLine();
-        return request;
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
-    public static void connect(int port) throws IOException {
-        serverSocket = new ServerSocket(port);
-        socket = serverSocket.accept();
-        initializeStreamVariables();
+    private void conectarSockets(int port) throws IOException {
+        serverStubSocket = new ServerSocket(port);
+        socket = serverStubSocket.accept();
     }
 
-    public static void closeConnection() throws IOException {
-        input.close();
-        output.close();
-        serverSocket.close();
+    public void closeConnection() throws IOException {
+        nomesParaStub.close();
+        stubParaNomes.close();
+        serverStubSocket.close();
         socket.close();
     }
 }
