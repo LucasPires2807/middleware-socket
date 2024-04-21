@@ -11,34 +11,32 @@ import java.util.Objects;
 
 public class Stub {
     private ServicoNome servicoNome;
+    private ServicoApp servicoApp;
     private Socket socketServicoNome;
     private Socket socketApp;
-    private List<String> servicoSolicitado;
     private PrintWriter stubParaNomes;
     private BufferedReader nomesParaStub;
     private PrintWriter stubParaApp;
     private  BufferedReader appParaStub;
-    private List<Object> enderecoServico;
-    private Object output;
 
-    public Object receberSolicitacaoServico(List<String> servicoSolicitado) {
-        this.servicoSolicitado = servicoSolicitado;
-        // Conectar o Stub com o serviço de nomes
+    public Object receberSolicitacaoServico(String servicoSolicitado, List<String> parametros) {
         try{
             servicoNome.receberSolicitacaoServico();
+            // Conectar o Stub com o serviço de nomes
             conectarNomesSockets(80);
             // Manda para o serviço de nomes o serviço solicitado
             stubParaNomes = new PrintWriter(socketServicoNome.getOutputStream(), true);
-            stubParaNomes.println(servicoSolicitado.get(0));
+            stubParaNomes.println(servicoSolicitado);
             nomesParaStub = new BufferedReader(new InputStreamReader(socketServicoNome.getInputStream()));
             // Pega o endereço do serviço
-            enderecoServico = Collections.singletonList(nomesParaStub.readLine());
+            List<Object> enderecoServico = Collections.singletonList(nomesParaStub.readLine());
+            servicoApp.receberSolicitacaoServico();
             conectarAppSockets(90);
             stubParaApp = new PrintWriter(socketApp.getOutputStream(), true);
-            // Tem que fazer a lógica de enviar os parâmetros também
             stubParaApp.println(enderecoServico);
-            nomesParaStub = new BufferedReader(new InputStreamReader(socketApp.getInputStream()));
-            output = nomesParaStub.readLine();
+            stubParaApp.println(parametros);
+            appParaStub = new BufferedReader(new InputStreamReader(socketApp.getInputStream()));
+            Object output = appParaStub.readLine();
             closeConnection();
             return output;
         } catch (Exception e) {

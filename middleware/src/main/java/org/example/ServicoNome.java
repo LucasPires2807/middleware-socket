@@ -17,6 +17,8 @@ public class ServicoNome {
     private static Socket socket;
     private BufferedReader stubParaNomes;
     private PrintWriter nomesParaStub;
+
+    // TODO implementar a subscrição de serviço no serviço de nomes
     public ServicoNome() {
         List<Object> valores1 = new ArrayList<>();
         valores1.add("localhost");
