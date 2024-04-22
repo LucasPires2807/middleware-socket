@@ -7,12 +7,17 @@ public class Cliente {
 
     Stub stub = new Stub();
 
-    public void solicitarServico(){
-        String funcao = "Soma";
-        List<String> valores = new ArrayList<>();
-        valores.add("5");
-        valores.add("2");
-        stub.receberSolicitacaoServico(funcao, valores);
-
+    public Object solicitarServico(){
+        String funcao = "Somar";
+        List<Integer> valores = new ArrayList<>();
+        valores.add(5);
+        valores.add(2);
+        return stub.receberSolicitacaoServico(funcao, valores);
     }
+
+    public static void main(String[] args) {
+        Cliente cliente = new Cliente();
+        System.out.println(cliente.solicitarServico());
+    }
+
 }

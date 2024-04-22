@@ -5,47 +5,58 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.io.InputStreamReader;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.*;
 
 public class Stub {
     private ServicoNome servicoNome;
     private ServicoApp servicoApp;
-    private Socket socketServicoNome;
+    private static Socket socketServicoNome;
     private Socket socketApp;
     private PrintWriter stubParaNomes;
     private BufferedReader nomesParaStub;
     private PrintWriter stubParaApp;
     private  BufferedReader appParaStub;
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public Object receberSolicitacaoServico(String servicoSolicitado, List<String> parametros) {
-        try{
-            servicoNome.receberSolicitacaoServico();
-            // Conectar o Stub com o serviço de nomes
+    public Object receberSolicitacaoServico(String servicoSolicitado, List<Integer> parametros) {
+        try {
             conectarNomesSockets(80);
+            System.out.println("Stub solicitando uma conexão ao serviço de nomes...");
             // Manda para o serviço de nomes o serviço solicitado
             stubParaNomes = new PrintWriter(socketServicoNome.getOutputStream(), true);
+            System.out.println("Stub enviando o serviço solicitado para o serviço de nomes...");
             stubParaNomes.println(servicoSolicitado);
             nomesParaStub = new BufferedReader(new InputStreamReader(socketServicoNome.getInputStream()));
             // Pega o endereço do serviço
-            List<Object> enderecoServico = Collections.singletonList(nomesParaStub.readLine());
-            servicoApp.receberSolicitacaoServico();
+            System.out.println("Stub recebendo o endereço do serviço...");
+            List<Object> enderecoServico = convertStringToList(nomesParaStub.readLine());
+            System.out.println("Stub solicitando conexão ao serviço de aplicação...");
             conectarAppSockets(90);
             stubParaApp = new PrintWriter(socketApp.getOutputStream(), true);
+            System.out.println("Stub enviando a solicitadao da função no endereço enviado...");
             stubParaApp.println(enderecoServico);
             stubParaApp.println(parametros);
             appParaStub = new BufferedReader(new InputStreamReader(socketApp.getInputStream()));
+            System.out.println("Stub recebendo o resultado...");
             Object output = appParaStub.readLine();
+            System.out.println("Stub fechando todas as conexões...");
             closeConnection();
             return output;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
-    private void conectarNomesSockets(int port) throws IOException {
+    private List<Object> convertStringToList(String input) {
+        input = input.substring(1, input.length() - 1);
+        String[] parts = input.split(", ");
+        return new ArrayList<>(Arrays.asList(parts));
+    }
+
+    private static void conectarNomesSockets(int port) throws IOException {
         socketServicoNome =  new Socket("localhost", port);
     }
 
