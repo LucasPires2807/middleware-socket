@@ -15,8 +15,6 @@ public class ServicoApp {
     private Socket socket;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    // TODO implementar funcao para subscrever serviço no serviço de nomes
-
     public static void main(String[] args) {
         ServicoApp servicoApp = new ServicoApp();
         servicoApp.receberSolicitacaoServico();
@@ -29,9 +27,7 @@ public class ServicoApp {
                 // Recebendo o endereço que o nome foi passado para o stub pelo usuário
                 BufferedReader stubParaApp = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 System.out.println("Serviço de aplicação lendo o endereço enviado pelo stub...");
-            //    List<Object> endereco = convertStringToList(stubParaApp.readLine());
-            //    System.out.println(endereco);
-                String servicoSolicitado = new String();
+                String servicoSolicitado = stubParaApp.readLine();;
                 System.out.println(servicoSolicitado);
                 String parametros_cru = stubParaApp.readLine();
                 List<Integer> parametros = convertStringToListInteger(parametros_cru);
@@ -43,6 +39,8 @@ public class ServicoApp {
                     resultado = somar(parametros);
                 } else if (servicoSolicitado.equals("Subtrair")) {
                     resultado = subtrair(parametros);
+                } else if (servicoSolicitado.equals("Multiplicar")) {
+                    resultado = multiplicar(parametros);
                 }
                 PrintWriter appParaStub = new PrintWriter(socket.getOutputStream(), true);
                 appParaStub.println(resultado);
@@ -64,18 +62,16 @@ public class ServicoApp {
         return integerList;
     }
 
-    private List<Object> convertStringToList(String input) {
-        input = input.substring(1, input.length() - 1);
-        String[] parts = input.split(", ");
-        return new ArrayList<>(Arrays.asList(parts));
-    }
-
     private float somar(List<Integer> nums){
         return nums.get(0) + nums.get(1);
     }
 
     private float subtrair(List<Integer> nums){
         return nums.get(0) - nums.get(1);
+    }
+
+    private float multiplicar(List<Integer> nums){
+        return nums.get(0) * nums.get(1);
     }
 
     private void conectarSockets(int port) throws IOException {

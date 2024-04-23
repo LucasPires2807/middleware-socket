@@ -32,7 +32,7 @@ public class ServicoNome {
         List<Object> valores3 = new ArrayList<>();
         valores3.add("localhost");
         valores3.add(90);
-        listaServicos.put("Multiplicação", valores1);
+        listaServicos.put("Multiplicar", valores1);
         listaServicos.put("Somar", valores2);
         listaServicos.put("Subtrair", valores3);
     }
