@@ -34,10 +34,13 @@ public class Stub {
             System.out.println("Stub recebendo o endereço do serviço...");
             List<Object> enderecoServico = convertStringToList(nomesParaStub.readLine());
             System.out.println("Stub solicitando conexão ao serviço de aplicação...");
-            conectarAppSockets(90);
+
+            int porta = (Integer.parseInt((String) enderecoServico.get(1)));
+            conectarAppSockets(porta);
+
             stubParaApp = new PrintWriter(socketApp.getOutputStream(), true);
             System.out.println("Stub enviando a solicitadao da função no endereço enviado...");
-            stubParaApp.println(enderecoServico);
+            stubParaApp.println(servicoSolicitado);
             stubParaApp.println(parametros);
             appParaStub = new BufferedReader(new InputStreamReader(socketApp.getInputStream()));
             System.out.println("Stub recebendo o resultado...");

@@ -25,14 +25,14 @@ public class ServicoNome {
     public ServicoNome() {
         List<Object> valores1 = new ArrayList<>();
         valores1.add("localhost");
-        valores1.add(8001);
+        valores1.add(90);
         List<Object> valores2 = new ArrayList<>();
         valores2.add("localhost");
-        valores2.add(8002);
+        valores2.add(90);
         List<Object> valores3 = new ArrayList<>();
         valores3.add("localhost");
-        valores3.add(8003);
-        listaServicos.put("Login", valores1);
+        valores3.add(90);
+        listaServicos.put("Multiplicação", valores1);
         listaServicos.put("Somar", valores2);
         listaServicos.put("Subtrair", valores3);
     }

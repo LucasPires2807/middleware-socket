@@ -22,29 +22,31 @@ public class ServicoApp {
         servicoApp.receberSolicitacaoServico();
     }
 
-    public Object receberSolicitacaoServico(){
-        return executor.submit(() -> {
-            try{
+    public void receberSolicitacaoServico(){
+        executor.submit(() -> {
+            try {
                 conectarSockets(90);
                 // Recebendo o endereço que o nome foi passado para o stub pelo usuário
                 BufferedReader stubParaApp = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 System.out.println("Serviço de aplicação lendo o endereço enviado pelo stub...");
-                List<Object> endereco = convertStringToList(stubParaApp.readLine());
-                System.out.println(endereco);
+            //    List<Object> endereco = convertStringToList(stubParaApp.readLine());
+            //    System.out.println(endereco);
+                String servicoSolicitado = new String();
+                System.out.println(servicoSolicitado);
                 String parametros_cru = stubParaApp.readLine();
                 List<Integer> parametros = convertStringToListInteger(parametros_cru);
                 // O endereço é suposto de ser o localhost, vamos verificar de acordo com a porta
                 Object resultado = null;
                 System.out.println("Serviço de aplicação executando a função solicitada...");
                 // Ver como os parâmetros serão passados para o serviço app
-                if (endereco.get(1).equals("8002")) {
+                if (servicoSolicitado.equals("Somar")) {
                     resultado = somar(parametros);
-                } else if (endereco.get(1).equals("8003")) {
+                } else if (servicoSolicitado.equals("Subtrair")) {
                     resultado = subtrair(parametros);
                 }
                 PrintWriter appParaStub = new PrintWriter(socket.getOutputStream(), true);
                 appParaStub.println(resultado);
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return 0;
